@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  alpha-mask-toolkit:
+    build: .
+    image: alpha-mask-toolkit:latest
+    container_name: alpha-mask-processor
+
+    # GPU support - requires nvidia-docker runtime
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Environment variables
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - SCRIPT=birefnet_direct_alpha.py  # Change to run different scripts
+
+    # Volume mounts
+    volumes:
+      # Mount your input images directory
+      - ./input:/app/input
+      # Mount output directory (optional - outputs go to input dir by default)
+      - ./output:/app/output
+      # Optional: Mount custom configuration
+      # - ./config.py:/app/config.py
+
+    # Resource limits (adjust based on your system)
+    mem_limit: 8g
+    shm_size: 2g
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Override default command if needed
+    # command: ["python", "create_alpha_masks.py"]
+
+  # Alternative service for different processing modes
+  alpha-mask-converter:
+    build: .
+    image: alpha-mask-toolkit:latest
+    container_name: alpha-mask-converter
+    profiles: ["converter"]  # Only runs when specifically requested
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - SCRIPT=create_alpha_masks.py
+
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+
+    mem_limit: 4g
+    shm_size: 1g
+
+    restart: "no"  # Run once and stop
+
+# Networks (optional)
+networks:
+  default:
+    name: alpha-mask-network
+
+# Volumes (optional - for persistent data)
+volumes:
+  model_cache:
+    driver: local

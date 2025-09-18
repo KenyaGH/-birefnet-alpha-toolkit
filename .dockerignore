@@ -1,0 +1,73 @@
+# Ignore development and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.coverage
+.env
+
+# Ignore git files
+.git/
+.gitignore
+.gitmodules
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore documentation and examples (unless needed)
+*.md
+!README_ALPHA_MASKS.md  # Keep the main README
+
+# Ignore large data directories
+8ij_to_PNGS/
+output_alpha_masks/
+reports/
+*.log
+
+# Ignore backup and temporary folders
+*_backup/
+*_temp/
+*_old/
+backup/
+temp/
+
+# Ignore input/output directories (these should be mounted)
+input/
+output/
+*_converted/
+*_mask/
+*_alpha_mask/
+
+# Ignore compressed files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Ignore large model files if they exist locally
+# (Docker will download them during build)
+BiRefNet/
+*.pth
+*.pt
+*.bin
+
+# Ignore Docker files themselves to prevent recursion
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Ignore local configuration files
+config_local.py
+settings_local.py
