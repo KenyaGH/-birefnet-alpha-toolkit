@@ -35,19 +35,23 @@ RUN pip install --no-cache-dir \
     prettytable \
     tabulate \
     huggingface-hub \
-    accelerate
+    accelerate && \
+    # Clean pip cache to save space
+    pip cache purge
 
-# Clone BiRefNet repository
-RUN git clone https://github.com/ZhengPeng7/BiRefNet.git
-
-# Download BiRefNet model weights (~844MB)
-RUN mkdir -p BiRefNet/checkpoints && \
+# Clone BiRefNet repository and download model in one layer
+RUN git clone https://github.com/ZhengPeng7/BiRefNet.git && \
+    mkdir -p BiRefNet/checkpoints && \
     cd BiRefNet/checkpoints && \
     wget -O BiRefNet-general.pth \
-    "https://github.com/ZhengPeng7/BiRefNet/releases/download/v1/BiRefNet-general-epoch_244.pth"
-
-# Verify model download (should be ~844MB)
-RUN ls -lh BiRefNet/checkpoints/BiRefNet-general.pth
+    "https://github.com/ZhengPeng7/BiRefNet/releases/download/v1/BiRefNet-general-epoch_244.pth" && \
+    # Verify download and clean up
+    ls -lh BiRefNet-general.pth && \
+    # Clean up git files and wget cache to save space
+    cd /app && \
+    rm -rf BiRefNet/.git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy toolkit scripts
 COPY *.py ./
