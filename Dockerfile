@@ -51,7 +51,6 @@ RUN ls -lh BiRefNet/checkpoints/BiRefNet-general.pth
 
 # Copy toolkit scripts
 COPY *.py ./
-COPY README_ALPHA_MASKS.md ./
 
 # Create directories for input/output volume mounting
 RUN mkdir -p /app/input /app/output
