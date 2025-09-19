@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-ci
     if: needs.check-ci.outputs.deploy == 'true'
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
     - name: 📥 Checkout code

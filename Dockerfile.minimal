@@ -11,7 +11,8 @@ LABEL version="1.0"
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (non-interactive)
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     wget \
     git \
@@ -21,7 +22,8 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     libgomp1 \
     libgl1-mesa-glx \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copy requirements first for better Docker layer caching
 COPY requirements.txt .
