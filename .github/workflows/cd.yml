@@ -75,10 +75,29 @@ jobs:
           org.opencontainers.image.description=AI-powered alpha mask generation using BiRefNet
           org.opencontainers.image.vendor=${{ github.repository_owner }}
 
-    - name: 🏗️ Build and push Docker image
+    - name: 🧹 Free up disk space for build
+      run: |
+        echo "Initial disk usage:"
+        df -h
+
+        # Remove unnecessary software
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo apt-get remove -y '^aspnetcore-.*' '^dotnet-.*' '^llvm-.*' '^postgresql-.*' '^mysql-.*'
+        sudo apt-get autoremove -y
+        sudo apt-get autoclean
+        docker system prune -af
+
+        echo "Disk usage after cleanup:"
+        df -h
+
+    - name: 🏗️ Build and push Docker image (minimal version)
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: ./Dockerfile.minimal
         platforms: linux/amd64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
@@ -97,9 +116,12 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🎯 Usage:" >> $GITHUB_STEP_SUMMARY
         echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo "# Pull the minimal image (model downloads on first run)" >> $GITHUB_STEP_SUMMARY
         echo "docker pull ${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
         echo "docker run --gpus all -v ./input:/app/input ${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
         echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Note**: This is a minimal build. BiRefNet model (~844MB) downloads automatically on first run." >> $GITHUB_STEP_SUMMARY
 
   # Create GitHub release for manual deployments
   release:

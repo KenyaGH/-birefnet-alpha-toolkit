@@ -1,0 +1,84 @@
+# Alpha Mask Toolkit - Minimal Docker Image
+# Base image without pre-downloaded models for CI/CD compatibility
+
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+
+# Metadata
+LABEL maintainer="Alpha Mask Toolkit"
+LABEL description="AI-powered alpha mask generation using BiRefNet (minimal build)"
+LABEL version="1.0"
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    git \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libgl1-mesa-glx \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better Docker layer caching
+COPY requirements.txt .
+
+# Install additional Python dependencies
+RUN pip install --no-cache-dir \
+    opencv-python \
+    scikit-image \
+    kornia \
+    einops \
+    prettytable \
+    tabulate \
+    huggingface-hub \
+    accelerate && \
+    pip cache purge
+
+# Clone BiRefNet repository (but don't download model weights)
+RUN git clone https://github.com/ZhengPeng7/BiRefNet.git && \
+    mkdir -p BiRefNet/checkpoints && \
+    rm -rf BiRefNet/.git && \
+    apt-get clean
+
+# Copy toolkit scripts
+COPY *.py ./
+
+# Create directories for input/output volume mounting
+RUN mkdir -p /app/input /app/output
+
+# Set environment variables
+ENV PYTHONPATH="/app/BiRefNet:$PYTHONPATH"
+ENV PYTHONUNBUFFERED=1
+
+# Set default configuration for container use
+ENV BASE_DIR="/app/input"
+ENV MODEL_PATH="/app/BiRefNet/checkpoints/BiRefNet-general.pth"
+ENV BIREFNET_PATH="/app/BiRefNet"
+
+# Create a script to download model on first run
+RUN echo '#!/bin/bash\n\
+MODEL_FILE="/app/BiRefNet/checkpoints/BiRefNet-general.pth"\n\
+if [ ! -f "$MODEL_FILE" ]; then\n\
+    echo "Downloading BiRefNet model weights (~844MB)..."\n\
+    cd /app/BiRefNet/checkpoints\n\
+    wget -O BiRefNet-general.pth "https://github.com/ZhengPeng7/BiRefNet/releases/download/v1/BiRefNet-general-epoch_244.pth"\n\
+    echo "Model download complete!"\n\
+else\n\
+    echo "Model already exists, skipping download."\n\
+fi\n\
+exec "$@"' > /app/download_model.sh && \
+    chmod +x /app/download_model.sh
+
+# Use download script as entrypoint
+ENTRYPOINT ["/app/download_model.sh"]
+
+# Default command runs the docker entrypoint script
+CMD ["python", "docker_entrypoint.py"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
