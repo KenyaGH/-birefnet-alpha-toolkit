@@ -10,7 +10,7 @@ import time
 import argparse
 import subprocess
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 
 class AlphaMaskTester:
     def __init__(self, base_dir: str = "."):
@@ -141,8 +141,13 @@ class AlphaMaskTester:
         print("🎨 Synthetic test images created successfully")
         return True
 
-    def _create_person_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_person_image(self, size: Tuple[int, int]) -> Any:
         """Create synthetic image with person-like shape."""
+        try:
+            from PIL import Image, ImageDraw
+        except ImportError:
+            return None
+
         img = Image.new('RGB', size, color=(100, 150, 200))  # Blue background
         draw = ImageDraw.Draw(img)
 
@@ -166,8 +171,13 @@ class AlphaMaskTester:
 
         return img
 
-    def _create_group_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_group_image(self, size: Tuple[int, int]) -> Any:
         """Create synthetic image with multiple people."""
+        try:
+            from PIL import Image, ImageDraw
+        except ImportError:
+            return None
+
         img = Image.new('RGB', size, color=(80, 120, 160))
         draw = ImageDraw.Draw(img)
 
@@ -193,20 +203,25 @@ class AlphaMaskTester:
 
         return img
 
-    def _create_portrait_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_portrait_image(self, size: Tuple[int, int]) -> Any:
         """Create portrait-style synthetic image."""
         return self._create_person_image(size)  # Similar to person for now
 
-    def _create_large_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_large_image(self, size: Tuple[int, int]) -> Any:
         """Create large resolution test image."""
         return self._create_person_image(size)
 
-    def _create_small_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_small_image(self, size: Tuple[int, int]) -> Any:
         """Create small resolution test image."""
         return self._create_person_image(size)
 
-    def _create_dark_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_dark_image(self, size: Tuple[int, int]) -> Any:
         """Create dark/low contrast image."""
+        try:
+            from PIL import Image, ImageDraw
+        except ImportError:
+            return None
+
         img = Image.new('RGB', size, color=(20, 20, 30))  # Very dark background
         draw = ImageDraw.Draw(img)
 
@@ -228,8 +243,13 @@ class AlphaMaskTester:
 
         return img
 
-    def _create_complex_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_complex_image(self, size: Tuple[int, int]) -> Any:
         """Create image with complex background."""
+        try:
+            from PIL import Image, ImageDraw
+        except ImportError:
+            return None
+
         img = Image.new('RGB', size, color=(150, 200, 100))  # Green base
         draw = ImageDraw.Draw(img)
 
@@ -261,7 +281,7 @@ class AlphaMaskTester:
 
         return img
 
-    def _create_default_image(self, size: Tuple[int, int]) -> Image.Image:
+    def _create_default_image(self, size: Tuple[int, int]) -> Any:
         """Create default test image."""
         return self._create_person_image(size)
 
