@@ -1,0 +1,7 @@
+# Placeholder file for Camera1_converted test images
+# Add your test images here:
+# - person001.jpg (standard portrait)
+# - person002.png (PNG format test)
+# - group001.jpg (multiple people)
+
+# You can use the test_runner.py --setup command to generate synthetic test images

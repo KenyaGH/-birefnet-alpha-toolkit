@@ -1,0 +1,8 @@
+# Placeholder file for EdgeCases_converted test images
+# Add challenging test images here:
+# - very_large.jpg (4K+ resolution)
+# - very_small.jpg (<500px resolution)
+# - dark_image.jpg (low light/contrast)
+# - complex_background.jpg (busy background)
+
+# You can use the test_runner.py --setup command to generate synthetic test images

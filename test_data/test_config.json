@@ -1,0 +1,65 @@
+{
+  "test_suites": {
+    "basic": {
+      "description": "Basic functionality tests",
+      "input_folders": [
+        "Camera1_converted",
+        "Camera2_converted"
+      ],
+      "expected_outputs": [
+        "Camera1_alpha_mask",
+        "Camera2_alpha_mask"
+      ],
+      "timeout_seconds": 300
+    },
+    "edge_cases": {
+      "description": "Edge case and stress tests",
+      "input_folders": [
+        "EdgeCases_converted"
+      ],
+      "expected_outputs": [
+        "EdgeCases_alpha_mask"
+      ],
+      "timeout_seconds": 600
+    },
+    "performance": {
+      "description": "Performance benchmarking",
+      "metrics": [
+        "processing_time_per_image",
+        "memory_usage_peak",
+        "gpu_utilization",
+        "model_loading_time"
+      ],
+      "thresholds": {
+        "max_time_per_image_seconds": 10,
+        "max_memory_gb": 8,
+        "min_gpu_utilization_percent": 70
+      }
+    }
+  },
+  "test_images": {
+    "small": {
+      "max_dimension": 500,
+      "expected_time_seconds": 2
+    },
+    "medium": {
+      "max_dimension": 1080,
+      "expected_time_seconds": 5
+    },
+    "large": {
+      "max_dimension": 2160,
+      "expected_time_seconds": 10
+    },
+    "xlarge": {
+      "max_dimension": 4000,
+      "expected_time_seconds": 20
+    }
+  },
+  "validation_criteria": {
+    "output_format": "PNG",
+    "color_mode": "L",
+    "pixel_values": [0, 255],
+    "min_subject_pixels": 1000,
+    "max_noise_pixels": 100
+  }
+}

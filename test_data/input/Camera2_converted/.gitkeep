@@ -1,0 +1,6 @@
+# Placeholder file for Camera2_converted test images
+# Add your test images here:
+# - portrait001.jpg (portrait orientation)
+# - outdoor001.png (outdoor scene)
+
+# You can use the test_runner.py --setup command to generate synthetic test images
